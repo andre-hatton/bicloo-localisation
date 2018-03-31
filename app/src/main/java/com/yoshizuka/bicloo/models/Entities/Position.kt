@@ -10,10 +10,10 @@ data class Position(
          * Latitude
          */
         @SerializedName("lat")
-        var lat: Float,
+        var lat: Double,
 
         /**
          * Longitude
          */
         @SerializedName("lng")
-        var lng: Float)
+        var lng: Double)

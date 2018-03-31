@@ -7,6 +7,10 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import android.net.NetworkInfo
+import android.net.ConnectivityManager
+import android.util.Log
+
 
 /**
  * Model parent permettant de généraliser les fonctionnalité des enfants
@@ -16,12 +20,18 @@ abstract class ApplicationModel(val mContext: Context) {
     /**
      * Initialisation des requête avec Volley
      */
-    val mRequestQueue: RequestQueue = Volley.newRequestQueue(mContext)
+    var mRequestQueue: RequestQueue? = null
 
     /**
      * Initialisation de gson
      */
     val mGson: Gson = GsonBuilder().create()
+
+    init {
+        if(isOnline()) {
+            mRequestQueue = Volley.newRequestQueue(mContext)
+        }
+    }
 
 
     protected companion object {
@@ -46,6 +56,17 @@ abstract class ApplicationModel(val mContext: Context) {
      * @param request La requête à envoyer
      */
     fun getJson(request: StringRequest) {
-        mRequestQueue.add(request)
+        Log.d("Request", request.url)
+        mRequestQueue?.add(request)
+    }
+
+    /**
+     * Vérifie que l'utilisateur est connecté à un réseau internet
+     * @return true si la connexion existe
+     */
+    fun isOnline(): Boolean {
+        val cm = mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.activeNetworkInfo
+        return netInfo != null && netInfo.isConnectedOrConnecting
     }
 }
