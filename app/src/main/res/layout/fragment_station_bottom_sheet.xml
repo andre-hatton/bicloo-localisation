@@ -47,5 +47,23 @@
             app:layout_constraintRight_toRightOf="parent"
             android:text="@{station}"/>
 
+        <TextView
+            android:id="@+id/station_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/station_stamp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="@{String.valueOf(station.position.lng)}"/>
+
+        <TextView
+            android:id="@+id/station_position_lat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/station_position"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="@{String.valueOf(station.position.lat)}"/>
+
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -1,5 +1,6 @@
 package com.yoshizuka.bicloo.models.entities
 
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -71,6 +72,11 @@ data class Station(
          */
         @SerializedName("last_update")
         var lastUpdate: Long) {
+
+    /**
+     * Convertit une position en LatLng pour google map
+     */
+    fun getMapPosition(): LatLng = LatLng(position.lat, position.lng)
 
     companion object {
         /**

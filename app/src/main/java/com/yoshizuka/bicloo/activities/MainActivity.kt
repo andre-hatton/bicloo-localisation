@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.PermissionChecker
+import android.util.Log
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.google.android.gms.location.LocationServices
@@ -89,6 +90,9 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         if(mMap != null) {
             updateMap()
         }
+        mStations.forEachIndexed { index, it ->
+            Log.d("Station","val station$index = Station(${it.id}, \"${it.name}\", \"\", Position(${it.position.lat}, ${it.position.lng}), ${it.banking}, ${it.bonus}, ${it.status}, ${it.bikeStands}, ${it.availableBikeStands}, ${it.availableBikes}, ${it.lastUpdate})")
+        }
     }
 
     override fun onMapReady(map: GoogleMap?) {
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             // permet de position la caméra sur la position de l'utilisateur à une distance respectable
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationClient.lastLocation.addOnSuccessListener {
+                Log.d("Station","val myPosition = LatLng(${it.latitude}, ${it.longitude})")
                 mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 14f))
             }
         } else {

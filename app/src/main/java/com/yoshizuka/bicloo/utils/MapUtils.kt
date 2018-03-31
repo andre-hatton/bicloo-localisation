@@ -1,6 +1,8 @@
 package com.yoshizuka.bicloo.utils
 
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
+import com.yoshizuka.bicloo.models.entities.Station
 
 /**
  * Classe utilitaire pour la gestion de google map
@@ -48,7 +50,34 @@ open class MapUtils {
                 poly.add(p)
             }
 
+            Log.d("poly", encoded + " => " + poly)
             return poly
+        }
+
+        /**
+         * Calcul la distance entre 2 points
+         * @param origin Premier point
+         * @param dest Second point
+         * @return Distance entre les 2 points
+         */
+        fun getDistance(origin: LatLng, dest: LatLng): Double {
+            val x = Math.abs(origin.latitude - dest.latitude)
+            val y = Math.abs(origin.longitude - dest.longitude)
+            return Math.sqrt(x * x + y * y)
+        }
+
+        fun getCloserStation(startPosition: LatLng, stations: List<Station>) : Station {
+            var closerStation = stations[0]
+            var minDistance = getDistance(startPosition, closerStation.getMapPosition())
+            stations.forEach {
+                val distance = getDistance(startPosition, it.getMapPosition())
+                if(distance < minDistance) {
+                    minDistance = distance
+                    closerStation = it
+                }
+
+            }
+            return closerStation
         }
     }
 }
