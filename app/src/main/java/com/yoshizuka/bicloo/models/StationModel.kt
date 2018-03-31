@@ -1,12 +1,15 @@
 package com.yoshizuka.bicloo.models
 
 import android.content.Context
+import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
+import com.beust.klaxon.*
 import com.google.gson.reflect.TypeToken
 import com.yoshizuka.bicloo.models.entities.Station
 import com.google.gson.Gson
-
+import com.google.android.gms.maps.model.LatLng
+import com.yoshizuka.bicloo.models.entities.Position
 
 
 /**
@@ -52,6 +55,54 @@ class StationModel(mContext: Context) : ApplicationModel(mContext) {
     }
 
     /**
+     * Permet de récupérer un itinéraire d'un point A à un point B
+     * @param origin Point d'origine
+     * @param dest Point d'arrivée
+     */
+    fun getDirections(origin: Position, dest: Position) {
+
+        // Origin of route
+        val str_origin = "origin=" + origin.lat + "," + origin.lng
+
+        // Destination of route
+        val str_dest = "destination=" + dest.lat + "," + dest.lng
+
+        // Sensor enabled
+        val sensor = "sensor=false"
+        val mode = "mode=bicycling"
+
+        // Building the parameters to the web service
+        val parameters = "$str_origin&$str_dest&$sensor&$mode"
+
+        // Output format
+        val output = "json"
+
+        // Building the url to the web service
+
+
+        val url = "https://maps.googleapis.com/maps/api/directions/$output?$parameters"
+
+        getJson(StringRequest(Request.Method.GET, url, {
+            Log.d("map", it)
+            val parser: Parser = Parser()
+            val stringBuilder: StringBuilder = StringBuilder(it)
+            val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+            val routes = json.array<JsonObject>("routes")
+
+            val points: JsonArray<JsonObject> =
+                    routes?.get("legs")?.get("steps")?.get(0) as? JsonArray<JsonObject>? ?: JsonArray()
+
+            mStationModelListener?.onGetDestination(points)
+
+            //val routes = json.arr
+            Log.d("map", "json : $json")
+
+        }, {
+            Log.d("map", it.message)
+        }))
+    }
+
+    /**
      * Interface permettant de renvoyer les données à l'activity
      */
     interface StationModelListener {
@@ -67,6 +118,12 @@ class StationModel(mContext: Context) : ApplicationModel(mContext) {
          * @param stations La listes des stations
          */
         fun onGetStations(stations: List<Station>)
+
+        /**
+         * Retourne la liste des étapes à prendre pour aller d'un point à un autre
+         * @param points La liste de points
+         */
+        fun onGetDestination(points: JsonArray<JsonObject>)
     }
 
 }
