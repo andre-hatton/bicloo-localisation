@@ -1,4 +1,4 @@
-package com.yoshizuka.bicloo.models.Entities
+package com.yoshizuka.bicloo.models.entities
 
 import com.google.gson.annotations.SerializedName
 

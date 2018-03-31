@@ -9,19 +9,20 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.PermissionChecker
-import android.util.Log
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.yoshizuka.bicloo.R
 import com.yoshizuka.bicloo.databinding.ActivityMainBinding
-import com.yoshizuka.bicloo.models.Entities.Position
-import com.yoshizuka.bicloo.models.Entities.Station
+import com.yoshizuka.bicloo.fragments.StationBottomSheetFragment
+import com.yoshizuka.bicloo.models.entities.Position
+import com.yoshizuka.bicloo.models.entities.Station
 import com.yoshizuka.bicloo.models.StationModel
 
 /**
@@ -136,12 +137,24 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         // gestion des marqueurs
         mStations.forEach {
             // ajout d'un marqueur sur les stations
-            mMap?.addMarker(
-                    MarkerOptions().position(LatLng(it.position.lat, it.position.lng)))
+            val markerOptions = MarkerOptions().position(LatLng(it.position.lat, it.position.lng))
+            if(it.status == Station.STATUS_CLOSED) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            } else if(it.availableBikes == 0) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+            } else if(it.availableBikeStands == 0) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+            } else {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            }
+            mMap?.addMarker(markerOptions)
 
             // gestion du clic sur un marqueur
             mMap?.setOnMarkerClickListener { marker ->
                 val station = mStations.find { it.position.equals(Position(marker.position.latitude, marker.position.longitude)) }
+                val stationFragment = StationBottomSheetFragment()
+                stationFragment.mStation = station
+                stationFragment.show(supportFragmentManager, "station")
                 station != null
             }
         }

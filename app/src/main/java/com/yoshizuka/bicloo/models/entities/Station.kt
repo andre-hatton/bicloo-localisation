@@ -1,4 +1,4 @@
-package com.yoshizuka.bicloo.models.Entities
+package com.yoshizuka.bicloo.models.entities
 
 import com.google.gson.annotations.SerializedName
 
@@ -70,4 +70,13 @@ data class Station(
          * Dernière mise à jour de la station
          */
         @SerializedName("last_update")
-        var lastUpdate: Long)
+        var lastUpdate: Long) {
+
+    companion object {
+        /**
+         * Les status disponible des stations
+         */
+        const val STATUS_CLOSED: String = "CLOSED"
+        const val STATUS_OPEN: String = "OPEN"
+    }
+}

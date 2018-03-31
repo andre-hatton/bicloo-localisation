@@ -4,8 +4,7 @@ import android.content.Context
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.google.gson.reflect.TypeToken
-import com.yoshizuka.bicloo.models.Entities.Station
-import java.lang.reflect.Type
+import com.yoshizuka.bicloo.models.entities.Station
 import com.google.gson.Gson
 
 
