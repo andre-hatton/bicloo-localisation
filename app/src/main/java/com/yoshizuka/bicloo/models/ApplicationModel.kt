@@ -5,13 +5,23 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 
 /**
  * Model parent permettant de généraliser les fonctionnalité des enfants
  */
 abstract class ApplicationModel(val mContext: Context) {
 
+    /**
+     * Initialisation des requête avec Volley
+     */
     val mRequestQueue: RequestQueue = Volley.newRequestQueue(mContext)
+
+    /**
+     * Initialisation de gson
+     */
+    val mGson: Gson = GsonBuilder().create()
 
 
     protected companion object {
@@ -31,6 +41,10 @@ abstract class ApplicationModel(val mContext: Context) {
         val DEFAULT_CONTRACT_NAME: String = "Nantes"
     }
 
+    /**
+     * Lance une requête à l'api
+     * @param request La requête à envoyer
+     */
     fun getJson(request: StringRequest) {
         mRequestQueue.add(request)
     }
