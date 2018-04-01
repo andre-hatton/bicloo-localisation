@@ -2,14 +2,16 @@ package com.yoshizuka.bicloo.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.databinding.DataBindingUtil
 import android.graphics.Color
+import android.net.ConnectivityManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.PermissionChecker
@@ -21,14 +23,15 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.*
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.yoshizuka.bicloo.R
 import com.yoshizuka.bicloo.databinding.ActivityMainBinding
 import com.yoshizuka.bicloo.fragments.StationBottomSheetFragment
@@ -50,57 +53,57 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     /**
      * Vue de l'activité
      */
-    lateinit var mBinding: ActivityMainBinding
+    private lateinit var mBinding: ActivityMainBinding
 
     /**
      * Objet google map
      */
-    var mMap: GoogleMap? = null
+    private var mMap: GoogleMap? = null
 
     /**
      * Le model de base de l'activité
      */
-    lateinit var mModel: StationModel
+    private lateinit var mModel: StationModel
 
     /**
      * La liste des stations
      */
-    var mStations: List<Station> = ArrayList()
+    private var mStations: List<Station> = ArrayList()
 
     /**
      * Liste des stations filtrées
      */
-    var mStationsFilter: List<Station> = ArrayList()
+    private var mStationsFilter: List<Station> = ArrayList()
 
     /**
      * Point de départ
      */
-    var mStartPlace: Marker? = null
+    private var mStartPlace: Marker? = null
 
     /**
      * Point d'arrivé
      */
-    var mEndPlace: Marker? = null
+    private var mEndPlace: Marker? = null
 
     /**
      * Fragment actuellement sur la vue
      */
-    var mCurrentFragment: Fragment? = null
+    private var mCurrentFragment: Fragment? = null
 
     /**
      * Le fragment de la carte
      */
-    lateinit var mMapFragment: SupportMapFragment
+    private lateinit var mMapFragment: SupportMapFragment
 
     /**
      * L'itinéraire en cours
      */
-    var mCurrentPolyline: Polyline? = null
+    private var mCurrentPolyline: Polyline? = null
 
     /**
      * Liste des marker dsur la carte
      */
-    val markers: MutableList<Marker> = ArrayList()
+    private val markers: MutableList<Marker> = ArrayList()
 
     /**
      * Variables et fonctions static
@@ -108,6 +111,8 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     companion object {
         private const val PLACE_PICKER_REQUEST_START = 2
         private const val PLACE_PICKER_REQUEST_END = 3
+
+        private const val SHARED_PREFERENCES_STATION_KEY = "stations"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,11 +167,18 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
 
         }
 
+
         // chargement de google map
         mMapFragment.getMapAsync(this)
 
         mModel = StationModel(this)
-        mModel.getStations()
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        if(!isOnline() && pref.contains(SHARED_PREFERENCES_STATION_KEY)) {
+            val listType = object : TypeToken<ArrayList<Station>>() {}.type
+            mStations = Gson().fromJson(pref.getString(SHARED_PREFERENCES_STATION_KEY, "[]"), listType)
+        } else if(isOnline()) {
+            mModel.getStations()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -216,6 +228,9 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
 
     override fun onGetStations(stations: List<Station>) {
         mStations = stations
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        sharedPreferences.putString(SHARED_PREFERENCES_STATION_KEY, Gson().toJson(mStations))
+        sharedPreferences.apply()
         if(mMap != null) {
             updateMap()
         }
@@ -241,6 +256,11 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             mCurrentPolyline?.remove()
             mCurrentPolyline = mMap?.addPolyline(options)
         }
+    }
+
+    override fun onError(message: String) {
+        Log.d("offline", "is offline")
+        AlertDialog.Builder(this).setCancelable(true).setMessage(message).show()
     }
 
     override fun onStationClick(station: Station?) {
@@ -275,7 +295,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     private fun updateMap() {
         if (PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
             mMap?.isMyLocationEnabled = true
-            mMap?.getUiSettings()?.isMyLocationButtonEnabled = true
+            mMap?.uiSettings?.isMyLocationButtonEnabled = true
 
             // permet de position la caméra sur la position de l'utilisateur à une distance respectable
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -283,11 +303,12 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
                 if(it != null) {
                     mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 14f))
                 } else {
-                    mMap?.moveCamera(CameraUpdateFactory.zoomBy(14f))
+                    // passage des coordonnées de Nantes
+                    mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(47.2172500, -1.5533600), 14f))
                 }
             }
         } else {
-            print("ACCES FAIL")
+            mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(47.2172500, -1.5533600), 14f))
         }
         loadMarker()
     }
@@ -296,19 +317,20 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
      * Chargement des marker sur la cartes
      * @param stations La liste des stations (par défaut toute)
      */
-    fun loadMarker(stations: List<Station> = mStations) {
+    private fun loadMarker(stations: List<Station> = mStations) {
         // gestion des marqueurs
         stations.forEach {
             // ajout d'un marqueur sur les stations
             val markerOptions = MarkerOptions().position(LatLng(it.position.lat, it.position.lng))
-            if(it.status == Station.STATUS_CLOSED) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-            } else if(it.availableBikes == 0) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-            } else if(it.availableBikeStands == 0) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-            } else {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+            when {
+                it.status == Station.STATUS_CLOSED ->
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                it.availableBikes == 0 ->
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                it.availableBikeStands == 0 ->
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                else ->
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             }
             val marker = mMap?.addMarker(markerOptions)
             if(marker != null) {
@@ -317,7 +339,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
 
             // gestion du clic sur un marqueur
             mMap?.setOnMarkerClickListener { aMarker ->
-                val station = mStations.find { it.position.equals(Position(aMarker.position.latitude, aMarker.position.longitude)) }
+                val station = mStations.find { it.position == Position(aMarker.position.latitude, aMarker.position.longitude) }
                 if(station != null) {
                     showStation(station)
                 }
@@ -333,7 +355,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     /**
      * Action permettant de faire une recherche
      */
-    fun loadPlacePicker(requestCode: Int = PLACE_PICKER_REQUEST_START) {
+    private fun loadPlacePicker(requestCode: Int = PLACE_PICKER_REQUEST_START) {
         val builder = PlacePicker.IntentBuilder()
 
         try {
@@ -349,6 +371,9 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
      * Lance l'itinéraire du point A à B
      */
     fun startRoute() {
+        if(!isOnline()) {
+
+        }
         if(mStartPlace != null && mEndPlace != null) {
             if(mCurrentFragment is StationFragment) switchFragment()
             val stationStart = MapUtils.getCloserStation(mStartPlace!!.position, mStations, true)
@@ -360,7 +385,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     /**
      * Supprime les marqueurs de la carte
      */
-    fun cleanMap() {
+    private fun cleanMap() {
         markers.map { it.remove() }
     }
 
@@ -368,7 +393,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
      * Affichage d'un bottom sheet pour les détails de la station
      * @param station La station à détailler
      */
-    fun showStation(station: Station?) {
+    private fun showStation(station: Station?) {
         if(station != null) {
             val stationFragment = StationBottomSheetFragment()
             stationFragment.mStation = station
@@ -385,14 +410,19 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             supportFragmentManager.popBackStack()
         } else {
             val stationFragment = StationFragment()
-            stationFragment.items = if(mStationsFilter.size > 0) mStationsFilter else mStations
+            stationFragment.items = if(mStationsFilter.isNotEmpty()) mStationsFilter else mStations
             supportFragmentManager.beginTransaction().add(R.id.content, stationFragment).addToBackStack("stationFragment").commit()
             mCurrentFragment = stationFragment
         }
     }
 
     /**
-     * Petite extension convertissant LatLng en Position
+     * Vérifie que l'utilisateur est connecté à un réseau internet
+     * @return true si la connexion existe
      */
-    fun LatLng.getPosition(): Position = Position(latitude, longitude)
+    private fun isOnline(): Boolean {
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.activeNetworkInfo
+        return netInfo != null && netInfo.isConnectedOrConnecting
+    }
 }

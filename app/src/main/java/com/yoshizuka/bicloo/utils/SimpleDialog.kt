@@ -1,7 +1,6 @@
 package com.yoshizuka.bicloo.utils
 
 import android.content.Context
-import android.content.DialogInterface
 import android.text.InputType
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
@@ -15,7 +14,7 @@ open class SimpleDialog {
          * Affiche un simple popup de recherche
          * @param context Le context
          * @param listener Texte retourner à la validation
-         *
+         * @param title Texte du popup
          */
         fun inputTextDialog(context: Context, listener: (String) -> Unit, title: String = "") {
             val builder = AlertDialog.Builder(context)
@@ -28,8 +27,8 @@ open class SimpleDialog {
             builder.setView(input)
 
             // Set up the buttons
-            builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which -> listener(input.text.toString()) })
-            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+            builder.setPositiveButton("OK", { _, _ -> listener(input.text.toString()) })
+            builder.setNegativeButton("Cancel", { dialog, _ -> dialog.cancel() })
             builder.show()
         }
     }
