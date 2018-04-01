@@ -87,7 +87,7 @@ class StationModel(mContext: Context) : ApplicationModel(mContext) {
             val routes = json.array<JsonObject>("routes")
 
             val points: JsonArray<JsonObject> =
-                    routes?.get("legs")?.get("steps")?.get(0) as? JsonArray<JsonObject>? ?: JsonArray()
+                    routes?.get("legs")?.get("steps")?.getOrNull(0) as? JsonArray<JsonObject>? ?: JsonArray()
 
             mStationModelListener?.onGetDestination(points)
 

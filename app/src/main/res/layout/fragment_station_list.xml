@@ -5,8 +5,6 @@
     android:name="com.yoshizuka.bicloo.fragments.StationFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
     tools:context=".fragments.StationFragment"
     tools:listitem="@layout/fragment_station"
     android:background="@color/white"/>

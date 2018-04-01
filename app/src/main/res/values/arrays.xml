@@ -2,9 +2,11 @@
 <resources>
     <string-array name="menu_array">
         <item>Départ</item>
-        <item>Arrivé</item>
+        <item>Arrivée</item>
+        <item>Toutes les stations</item>
         <item>Stations ouvertes</item>
         <item>Vélos disponibles</item>
-        <item>Places disponible</item>
+        <item>Places disponibles</item>
+        <item>Recherche station</item>
     </string-array>
 </resources>

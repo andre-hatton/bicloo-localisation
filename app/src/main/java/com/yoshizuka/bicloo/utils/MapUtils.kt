@@ -66,12 +66,23 @@ open class MapUtils {
             return Math.sqrt(x * x + y * y)
         }
 
-        fun getCloserStation(startPosition: LatLng, stations: List<Station>) : Station {
+        /**
+         * Recherche la station la plus proche
+         * @param startPosition La position de reference
+         * @param stations La liste des stations
+         */
+        fun getCloserStation(startPosition: LatLng, stations: List<Station>, stationStart: Boolean = true) : Station {
             var closerStation = stations[0]
             var minDistance = getDistance(startPosition, closerStation.getMapPosition())
             stations.forEach {
                 val distance = getDistance(startPosition, it.getMapPosition())
-                if(distance < minDistance) {
+                // bérifie la disponibilité de vélo et d'emplacements libre
+                val available = if(stationStart) {
+                    it.availableBikes > 0
+                } else {
+                    it.availableBikeStands > 0
+                }
+                if(distance < minDistance && it.status != Station.STATUS_CLOSED && available) {
                     minDistance = distance
                     closerStation = it
                 }
@@ -79,5 +90,35 @@ open class MapUtils {
             }
             return closerStation
         }
+
+        /**
+         * Recherche des stations ouvertes dans la liste des stations
+         * @param Liste des stations
+         * @return Liste des stations ouverte
+         */
+        fun getStationOpen(stations: List<Station>): List<Station> = stations.filter { it.status == Station.STATUS_OPEN }
+
+        /**
+         * Recherche des stations aillant des vélos dans la liste des stations
+         * @param Liste des stations
+         * @return Liste des stations ouverte
+         */
+        fun getStationBikesAvailable(stations: List<Station>): List<Station> = stations.filter { it.availableBikes > 0 }
+
+        /**
+         * Recherche des stations libre dans la liste des stations
+         * @param Liste des stations
+         * @return Liste des stations aillant encore des places
+         */
+        fun getStationBikesStandsAvailable(stations: List<Station>): List<Station> = stations.filter { it.availableBikeStands > 0 }
+
+        /**
+         * Recherche des stations dont le nom correspond à [name]
+         * @param Liste des stations
+         * @param Le nom à chercher
+         * @return Liste des stations correspondant au nom
+         */
+        fun getStationWithName(stations: List<Station>, name: String): List<Station> = stations.filter { it.name.toLowerCase().contains(name.toLowerCase()) }
+
     }
 }

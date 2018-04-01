@@ -49,14 +49,14 @@ class StationAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         mBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.fragment_station, parent, false)
 
-        return ViewHolder(mBinding.root)
+        return ViewHolder(mBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mStations[position]
-        mBinding.station = item
+        holder.bind(item)
 
-        with(holder.mView) {
+        with(holder.mBinding.root) {
             tag = item
             setOnClickListener(mOnClickListener)
         }
@@ -64,8 +64,10 @@ class StationAdapter(
 
     override fun getItemCount(): Int = mStations.size
 
-    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-
-
+    inner class ViewHolder(val mBinding: FragmentStationBinding) : RecyclerView.ViewHolder(mBinding.root) {
+        fun bind(station: Station) {
+            mBinding.station = station
+            mBinding.executePendingBindings()
+        }
     }
 }
