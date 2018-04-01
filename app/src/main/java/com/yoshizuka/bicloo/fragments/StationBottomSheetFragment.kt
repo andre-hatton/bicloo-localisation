@@ -31,9 +31,6 @@ class StationBottomSheetFragment : BottomSheetDialogFragment() {
      * Station à afficher
      */
     var mStation: Station? = null
-        set(value) {
-            field = value
-        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

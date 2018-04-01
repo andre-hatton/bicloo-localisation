@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="menu_array">
+        <item>Départ</item>
+        <item>Arrivé</item>
+        <item>Stations ouvertes</item>
+        <item>Vélos disponibles</item>
+        <item>Places disponible</item>
+    </string-array>
+</resources>

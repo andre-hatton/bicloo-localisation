@@ -18,9 +18,6 @@ import com.yoshizuka.bicloo.models.entities.Position
 class StationModel(mContext: Context) : ApplicationModel(mContext) {
 
     var mStationModelListener: StationModelListener? = null
-        set(value) {
-            field = value
-        }
 
     init {
         if(mContext is StationModelListener) {
@@ -93,9 +90,6 @@ class StationModel(mContext: Context) : ApplicationModel(mContext) {
                     routes?.get("legs")?.get("steps")?.get(0) as? JsonArray<JsonObject>? ?: JsonArray()
 
             mStationModelListener?.onGetDestination(points)
-
-            //val routes = json.arr
-            Log.d("map", "json : $json")
 
         }, {
             Log.d("map", it.message)
