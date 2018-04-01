@@ -12,6 +12,7 @@ import com.yoshizuka.bicloo.R
 import com.yoshizuka.bicloo.adapters.StationAdapter
 
 import com.yoshizuka.bicloo.models.entities.Station
+import com.yoshizuka.bicloo.utils.SimpleDividerItemDecoration
 
 /**
  * A fragment representing a list of Items.
@@ -39,6 +40,7 @@ class StationFragment : Fragment() {
             with(view) {
                 layoutManager = LinearLayoutManager(context)
                 adapter = StationAdapter(items, listener)
+                addItemDecoration(SimpleDividerItemDecoration(context))
             }
             mAdapter = view.adapter as StationAdapter?
         }

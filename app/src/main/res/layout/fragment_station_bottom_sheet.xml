@@ -36,34 +36,36 @@
             app:layout_constraintTop_toBottomOf="@+id/station_name"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:text="@{station.status.equals(Station.STATUS_OPEN) ? `OUVERTE` : `FERME`}"/>
+            android:text="@{station.status.equals(Station.STATUS_OPEN) ? @string/open : @string/closed}"
+            android:textColor="@{station.status.equals(Station.STATUS_OPEN) ? @android:color/holo_green_dark : @android:color/holo_red_dark}"/>
 
         <TextView
-            android:id="@+id/station_stamp"
+            android:id="@+id/station_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/station_status"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:text="@{station}"/>
+            android:gravity="center_horizontal"
+            android:text="@{station.address}"/>
 
         <TextView
-            android:id="@+id/station_position"
+            android:id="@+id/station_bike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/station_stamp"
+            app:layout_constraintTop_toBottomOf="@+id/station_address"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:text="@{String.valueOf(station.position.lng)}"/>
+            android:bikes="@{station}"/>
 
         <TextView
-            android:id="@+id/station_position_lat"
+            android:id="@+id/station_stand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/station_position"
+            app:layout_constraintTop_toBottomOf="@+id/station_bike"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:text="@{String.valueOf(station.position.lat)}"/>
+            android:stands="@{station}"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

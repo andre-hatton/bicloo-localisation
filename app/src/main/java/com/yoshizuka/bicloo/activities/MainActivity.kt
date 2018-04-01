@@ -128,44 +128,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         toolbar?.setNavigationOnClickListener { drawer_layout?.openDrawer(left_drawer) }
         mMapFragment = SupportMapFragment()
         supportFragmentManager.beginTransaction().add(R.id.content, mMapFragment).commit()
-        left_drawer?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            drawer_layout?.closeDrawer(left_drawer)
-            when (position) {
-                0 -> {
-                    loadPlacePicker(PLACE_PICKER_REQUEST_START)
-                }
-                1 -> {
-                    loadPlacePicker(PLACE_PICKER_REQUEST_END)
-                }
-                2 -> {
-                    loadMarker(mStations)
-                }
-                3 -> {
-                    cleanMap()
-                    mStationsFilter = MapUtils.getStationOpen(mStations)
-                    loadMarker(mStationsFilter)
-
-                }
-                4 -> {
-                    cleanMap()
-                    mStationsFilter = MapUtils.getStationBikesAvailable(mStations)
-                    loadMarker(mStationsFilter)
-                }
-                5 -> {
-                    cleanMap()
-                    mStationsFilter = MapUtils.getStationBikesStandsAvailable(mStations)
-                    loadMarker(mStationsFilter)
-                }
-                6 -> {
-                    SimpleDialog.inputTextDialog(this, {
-                        cleanMap()
-                        mStationsFilter = MapUtils.getStationWithName(mStations, it)
-                        loadMarker(mStationsFilter)
-                    }, getString(R.string.popup_station_name_title))
-                }
-            }
-
-        }
+        setMenuOptions()
 
 
         // chargement de google map
@@ -223,11 +186,11 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     }
 
     override fun onGetStation(station: Station) {
-        println(station)
     }
 
     override fun onGetStations(stations: List<Station>) {
         mStations = stations
+        // enregistre la liste des stations pour le mode hors ligne
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this).edit()
         sharedPreferences.putString(SHARED_PREFERENCES_STATION_KEY, Gson().toJson(mStations))
         sharedPreferences.apply()
@@ -290,6 +253,50 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
     }
 
     /**
+     * Gestion du menu
+     */
+    private fun setMenuOptions() {
+        left_drawer?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            drawer_layout?.closeDrawer(left_drawer)
+            when (position) {
+                0 -> {
+                    loadPlacePicker(PLACE_PICKER_REQUEST_START)
+                }
+                1 -> {
+                    loadPlacePicker(PLACE_PICKER_REQUEST_END)
+                }
+                2 -> {
+                    loadMarker(mStations)
+                }
+                3 -> {
+                    cleanMap()
+                    mStationsFilter = MapUtils.getStationOpen(mStations)
+                    loadMarker(mStationsFilter)
+
+                }
+                4 -> {
+                    cleanMap()
+                    mStationsFilter = MapUtils.getStationBikesAvailable(mStations)
+                    loadMarker(mStationsFilter)
+                }
+                5 -> {
+                    cleanMap()
+                    mStationsFilter = MapUtils.getStationBikesStandsAvailable(mStations)
+                    loadMarker(mStationsFilter)
+                }
+                6 -> {
+                    SimpleDialog.inputTextDialog(this, {
+                        cleanMap()
+                        mStationsFilter = MapUtils.getStationWithName(mStations, it)
+                        loadMarker(mStationsFilter)
+                    }, getString(R.string.popup_station_name_title))
+                }
+            }
+
+        }
+    }
+
+    /**
      * Mise à jour de la carte
      */
     private fun updateMap() {
@@ -308,6 +315,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
                 }
             }
         } else {
+            // passage des coordonnées de Nantes
             mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(47.2172500, -1.5533600), 14f))
         }
         loadMarker()
@@ -325,9 +333,9 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             when {
                 it.status == Station.STATUS_CLOSED ->
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                it.availableBikes == 0 ->
+                it.availableBikes == 0 && isOnline() ->
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                it.availableBikeStands == 0 ->
+                it.availableBikeStands == 0 && isOnline() ->
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
                 else ->
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
