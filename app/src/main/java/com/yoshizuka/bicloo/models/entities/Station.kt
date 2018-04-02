@@ -9,6 +9,7 @@ import java.io.Serializable
 /**
  * Objet définissant ce qu'est une sttion
  */
+@Suppress("MemberVisibilityCanBePrivate")
 data class Station(
         /**
          * Identifiant d'une station

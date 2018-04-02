@@ -122,7 +122,6 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mBinding.activity = this
 
-
         setSupportActionBar(toolbar)
         toolbar?.navigationIcon = ContextCompat.getDrawable(this, R.mipmap.ic_drawer)
         toolbar?.setNavigationOnClickListener { drawer_layout?.openDrawer(left_drawer) }
@@ -163,13 +162,14 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
                     mEndPlace?.remove()
                     mEndPlace = marker
                 }
-                fab.visibility = if(mStartPlace != null && mEndPlace != null) {
-                    View.VISIBLE
+                if(mStartPlace != null && mEndPlace != null) {
+                    fab.show()
                 } else {
-                    View.GONE
+                    fab.hide()
                 }
             }
         }
+        loading.visibility = View.GONE
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -218,11 +218,13 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             for (point in polypts) options.add(point)
             mCurrentPolyline?.remove()
             mCurrentPolyline = mMap?.addPolyline(options)
+            fab.hide()
         }
+        loading.visibility = View.GONE
     }
 
     override fun onError(message: String) {
-        Log.d("offline", "is offline")
+        loading.visibility = View.GONE
         AlertDialog.Builder(this).setCancelable(true).setMessage(message).show()
     }
 
@@ -260,26 +262,32 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
             drawer_layout?.closeDrawer(left_drawer)
             when (position) {
                 0 -> {
+                    loading.visibility = View.VISIBLE
                     loadPlacePicker(PLACE_PICKER_REQUEST_START)
                 }
                 1 -> {
+                    loading.visibility = View.VISIBLE
                     loadPlacePicker(PLACE_PICKER_REQUEST_END)
                 }
                 2 -> {
+                    loading.visibility = View.VISIBLE
                     loadMarker(mStations)
                 }
                 3 -> {
+                    loading.visibility = View.VISIBLE
                     cleanMap()
                     mStationsFilter = MapUtils.getStationOpen(mStations)
                     loadMarker(mStationsFilter)
 
                 }
                 4 -> {
+                    loading.visibility = View.VISIBLE
                     cleanMap()
                     mStationsFilter = MapUtils.getStationBikesAvailable(mStations)
                     loadMarker(mStationsFilter)
                 }
                 5 -> {
+                    loading.visibility = View.VISIBLE
                     cleanMap()
                     mStationsFilter = MapUtils.getStationBikesStandsAvailable(mStations)
                     loadMarker(mStationsFilter)
@@ -358,6 +366,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         if(mCurrentFragment is StationFragment) {
             (mCurrentFragment as StationFragment).items = stations
         }
+        loading.visibility = View.GONE
     }
 
     /**
@@ -383,6 +392,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
 
         }
         if(mStartPlace != null && mEndPlace != null) {
+            loading.visibility = View.VISIBLE
             if(mCurrentFragment is StationFragment) switchFragment()
             val stationStart = MapUtils.getCloserStation(mStartPlace!!.position, mStations, true)
             val endStation = MapUtils.getCloserStation(mEndPlace!!.position, mStations, false)
@@ -419,7 +429,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         } else {
             val stationFragment = StationFragment()
             stationFragment.items = if(mStationsFilter.isNotEmpty()) mStationsFilter else mStations
-            supportFragmentManager.beginTransaction().add(R.id.content, stationFragment).addToBackStack("stationFragment").commit()
+            supportFragmentManager.beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit).add(R.id.content, stationFragment).addToBackStack("stationFragment").commit()
             mCurrentFragment = stationFragment
         }
     }

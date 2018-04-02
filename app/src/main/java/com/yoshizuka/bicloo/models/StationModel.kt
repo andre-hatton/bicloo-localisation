@@ -90,12 +90,17 @@ class StationModel(mContext: Context) : ApplicationModel(mContext) {
             val stringBuilder = StringBuilder(it)
             val json: JsonObject = parser.parse(stringBuilder) as JsonObject
             val routes = json.array<JsonObject>("routes")
+            val status = json.string("status")
+            if(status == "OK") {
+                @Suppress("UNCHECKED_CAST")
+                val points: JsonArray<JsonObject> =
+                        routes?.get("legs")?.get("steps")?.getOrNull(0) as? JsonArray<JsonObject>?
+                                ?: JsonArray()
 
-            @Suppress("UNCHECKED_CAST")
-            val points: JsonArray<JsonObject> =
-                    routes?.get("legs")?.get("steps")?.getOrNull(0) as? JsonArray<JsonObject>? ?: JsonArray()
-
-            mStationModelListener?.onGetDestination(points)
+                mStationModelListener?.onGetDestination(points)
+            } else {
+                mStationModelListener?.onError(json.string("error_message") ?: "")
+            }
 
         }, {
             mStationModelListener?.onError(it.message ?: "")

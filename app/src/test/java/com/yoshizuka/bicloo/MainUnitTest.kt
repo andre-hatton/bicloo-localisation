@@ -10,7 +10,7 @@ import org.junit.Assert.*
 
 class MainUnitTest {
     
-    val mStations = ArrayList<Station>()
+    private val mStations = ArrayList<Station>()
     init {
         setPositionTest()
     }
@@ -38,7 +38,7 @@ class MainUnitTest {
      * Test que la fonction pour recupérer la station la plus proche d'un point donnée donctionne
      */
     @Test
-    fun testcloserStation() {
+    fun testCloserStation() {
         var myPosition = LatLng(47.2229697, -1.5334502)
         var closerStation = MapUtils.getCloserStation(myPosition, mStations)
         assertEquals(25, closerStation.id)
@@ -50,12 +50,27 @@ class MainUnitTest {
         myPosition = LatLng(47.210549, -1.567368)
         closerStation = MapUtils.getCloserStation(myPosition, mStations)
         assertEquals(36, closerStation.id)
+
+        // Station la plus proche fermé
+        myPosition = LatLng(47.2141946314964, -1.52973588598033)
+        closerStation = MapUtils.getCloserStation(myPosition, mStations)
+        assertEquals(10, closerStation.id)
+
+        // Station la plus proche n'a pas de vélo siponible
+        myPosition = LatLng(47.21921395261352, -1.561570147641708)
+        closerStation = MapUtils.getCloserStation(myPosition, mStations)
+        assertEquals(15, closerStation.id)
+
+        // Station la plus proche aillant des emplacements disponibles
+        myPosition = LatLng(47.21230895884701, -1.571369360221906)
+        closerStation = MapUtils.getCloserStation(myPosition, mStations, false)
+        assertEquals(74, closerStation.id)
     }
 
     /**
-     * Recup d'une liste de station pour les test (poition réel récupérer via l'api)
+     * Recup d'une liste de station pour les test (poition réel récupérer via l'api) => certaines données incohérentes pour des test d'emplacement
      */
-    fun setPositionTest() {
+    private fun setPositionTest() {
         mStations.add(Station(10, "00010- PICASSO", "", Position(47.216369613307506, -1.534184544523239), false, false, "OPEN", 18, 11, 7, 1522533803000))
         mStations.add(Station(38, "00038-PLACE RICORDEAU", "", Position(47.212108463141774, -1.553049129320471), true, false, "OPEN", 40, 16, 24, 1522534094000))
         mStations.add(Station(66, "00066-CHANZY", "", Position(47.22542988533347, -1.547999925907375), false, false, "OPEN", 15, 8, 7, 1522534027000))
@@ -84,7 +99,7 @@ class MainUnitTest {
         mStations.add(Station(56, "00056-VINCENT GACHE", "", Position(47.206798618575256, -1.541777739850638), false, false, "OPEN", 15, 4, 11, 1522533955000))
         mStations.add(Station(7, "00007- BARILLERIE", "", Position(47.215331358010445, -1.556126125975167), false, false, "OPEN", 15, 7, 8, 1522533727000))
         mStations.add(Station(27, "00027-GUIST'HAU NORD", "", Position(47.21792981632508, -1.569171883302444), false, true, "OPEN", 15, 12, 3, 1522533629000))
-        mStations.add(Station(15, "00015-PLACE ARISTIDE BRIAND", "", Position(47.21718482329023, -1.562986793288367), false, false, "OPEN", 17, 13, 3, 1522534177000))
+        mStations.add(Station(15, "00015-PLACE ARISTIDE BRIAND", "", Position(47.21718482329023, -1.562986793288367), false, false, "OPEN", 17, 0, 3, 1522534177000))
         mStations.add(Station(83, "00083-MILLERAND", "", Position(47.208199645038825, -1.530180435959972), true, false, "OPEN", 14, 5, 9, 1522533831000))
         mStations.add(Station(45, "00045-PRAIRIE AU DUC", "", Position(47.2047839355992, -1.55892310936669), false, false, "OPEN", 13, 11, 2, 1522533742000))
         mStations.add(Station(34, "00034-MEDIATHEQUE", "", Position(47.210886925815934, -1.561744905652581), true, false, "OPEN", 20, 15, 4, 1522533688000))
@@ -102,7 +117,7 @@ class MainUnitTest {
         mStations.add(Station(59, "00059-STADE SAUPIN", "", Position(47.21391161818379, -1.539712888264826), false, false, "OPEN", 15, 4, 11, 1522533670000))
         mStations.add(Station(53, "00053-OLIVETTES", "", Position(47.211736393222054, -1.549886024937758), false, false, "OPEN", 15, 10, 5, 1522534156000))
         mStations.add(Station(57, "00057-GAETAN RONDEAU", "", Position(47.205396132179104, -1.537581863003988), true, false, "OPEN", 20, 3, 16, 1522533960000))
-        mStations.add(Station(76, "00076-PLACE RENÃ BOUHIER", "", Position(47.209429092524424, -1.570515336280715), true, false, "OPEN", 15, 9, 6, 1522533580000))
+        mStations.add(Station(76, "00076-PLACE RENÃ BOUHIER", "", Position(47.209429092524424, -1.570515336280715), true, false, "OPEN", 15, 0, 6, 1522533580000))
         mStations.add(Station(8, "00008-BOUCHERIE", "", Position(47.21620089258823, -1.557111680197571), true, false, "OPEN", 19, 8, 11, 1522533874000))
         mStations.add(Station(75, "00075-LAMORICIERE", "", Position(47.21230895884701, -1.571369360221906), false, false, "OPEN", 18, 0, 18, 1522533894000))
         mStations.add(Station(73, "00073-SARRADIN", "", Position(47.220882433018865, -1.570438598073934), false, false, "OPEN", 13, 13, 0, 1522533645000))
@@ -134,7 +149,7 @@ class MainUnitTest {
         mStations.add(Station(11, "00011-CALVAIRE", "", Position(47.215578942427136, -1.560675283700123), true, true, "OPEN", 15, 11, 4, 1522533705000))
         mStations.add(Station(101, "00101 - PIRMIL", "", Position(47.1965313642396, -1.54156809120326), true, false, "OPEN", 28, 14, 14, 1522533861000))
         mStations.add(Station(63, "00063-JARDIN DES PLANTES", "", Position(47.219834197318974, -1.544718964531585), false, false, "OPEN", 35, 17, 18, 1522534179000))
-        mStations.add(Station(16, "00016-PLACE EDOUARD NORMAND", "", Position(47.21902754473837, -1.563419484053747), false, false, "OPEN", 15, 15, 0, 1522534128000))
+        mStations.add(Station(16, "00016-PLACE EDOUARD NORMAND", "", Position(47.21902754473837, -1.563419484053747), false, false, "OPEN", 15, 0, 0, 1522534128000))
         mStations.add(Station(100, "00100 - GRENERAIE", "", Position(47.199923092905216, -1.534717540470481), true, false, "OPEN", 20, 4, 16, 1522534042000))
         mStations.add(Station(88, "00088-MELLINET", "", Position(47.211501070117826, -1.577175414321782), false, false, "OPEN", 15, 13, 2, 1522533652000))
         mStations.add(Station(70, "00070-GARE SUD 2", "", Position(47.215505, -1.542844), false, false, "OPEN", 70, 15, 55, 1522533712000))

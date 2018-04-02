@@ -1,6 +1,5 @@
 package com.yoshizuka.bicloo.utils
 
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.yoshizuka.bicloo.models.entities.Station
 
@@ -49,8 +48,6 @@ open class MapUtils {
                         lng.toDouble() / 1E5)
                 poly.add(p)
             }
-
-            Log.d("poly", encoded + " => " + poly)
             return poly
         }
 
@@ -82,7 +79,7 @@ open class MapUtils {
                 } else {
                     it.availableBikeStands > 0
                 }
-                if(distance < minDistance && it.status != Station.STATUS_CLOSED && available) {
+                if(distance < minDistance && it.status == Station.STATUS_OPEN && available) {
                     minDistance = distance
                     closerStation = it
                 }
@@ -93,29 +90,29 @@ open class MapUtils {
 
         /**
          * Recherche des stations ouvertes dans la liste des stations
-         * @param Liste des stations
+         * @param stations Liste des stations
          * @return Liste des stations ouverte
          */
         fun getStationOpen(stations: List<Station>): List<Station> = stations.filter { it.status == Station.STATUS_OPEN }
 
         /**
          * Recherche des stations aillant des vélos dans la liste des stations
-         * @param Liste des stations
+         * @param stations Liste des stations
          * @return Liste des stations ouverte
          */
         fun getStationBikesAvailable(stations: List<Station>): List<Station> = stations.filter { it.availableBikes > 0 }
 
         /**
          * Recherche des stations libre dans la liste des stations
-         * @param Liste des stations
+         * @param stations Liste des stations
          * @return Liste des stations aillant encore des places
          */
         fun getStationBikesStandsAvailable(stations: List<Station>): List<Station> = stations.filter { it.availableBikeStands > 0 }
 
         /**
          * Recherche des stations dont le nom correspond à [name]
-         * @param Liste des stations
-         * @param Le nom à chercher
+         * @param stations Liste des stations
+         * @param name Le nom à chercher
          * @return Liste des stations correspondant au nom
          */
         fun getStationWithName(stations: List<Station>, name: String): List<Station> = stations.filter { it.name.toLowerCase().contains(name.toLowerCase()) }

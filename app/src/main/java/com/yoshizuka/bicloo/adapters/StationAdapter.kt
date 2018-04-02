@@ -5,17 +5,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.yoshizuka.bicloo.BR
 import com.yoshizuka.bicloo.R
 import com.yoshizuka.bicloo.databinding.FragmentStationBinding
-import com.yoshizuka.bicloo.databinding.FragmentStationBottomSheetBinding
 
 
 import com.yoshizuka.bicloo.fragments.StationFragment.OnStationFragmentListener
 import com.yoshizuka.bicloo.models.entities.Station
 
-import kotlinx.android.synthetic.main.fragment_station.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [Station] and makes a call to the

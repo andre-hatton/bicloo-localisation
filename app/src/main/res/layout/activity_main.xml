@@ -69,12 +69,28 @@
                 android:layout_gravity="bottom|end"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/colorPrimary"
+                android:tint="@color/white"
                 android:onClick="@{() -> activity.startRoute()}"
                 android:src="@android:drawable/ic_menu_search"
                 android:visibility="gone" />
 
         </android.support.design.widget.CoordinatorLayout>
 
+
+        <FrameLayout
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorGreyAlpha"
+            android:visibility="gone">
+            <android.support.v4.widget.ContentLoadingProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:progress="@android:integer/config_shortAnimTime"
+                android:theme="?android:attr/progressBarStyleLarge"/>
+        </FrameLayout>
         <ListView
             android:id="@+id/left_drawer"
             android:layout_width="240dp"
