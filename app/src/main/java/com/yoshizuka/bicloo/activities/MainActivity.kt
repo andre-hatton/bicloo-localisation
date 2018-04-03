@@ -16,7 +16,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.PermissionChecker
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import com.beust.klaxon.JsonArray
@@ -394,9 +393,10 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         if(mStartPlace != null && mEndPlace != null) {
             loading.visibility = View.VISIBLE
             if(mCurrentFragment is StationFragment) switchFragment()
-            val stationStart = MapUtils.getCloserStation(mStartPlace!!.position, mStations, true)
-            val endStation = MapUtils.getCloserStation(mEndPlace!!.position, mStations, false)
-            mModel.getDirections(stationStart.position, endStation.position)
+            val stationStart = MapUtils.getClosersStation(1, mStartPlace!!.position, mStations, true)
+            val endStation = MapUtils.getClosersStation(1, mEndPlace!!.position, mStations, false)
+            //todo : créer un popup pour proposer plusieurs stations d'arrivé et de départ avant d'appeler getDirection
+            mModel.getDirections(stationStart[0].position, endStation[0].position)
         }
     }
 

@@ -68,6 +68,18 @@ class MainUnitTest {
     }
 
     /**
+     * Test que les 3 station les plus proche soit bien celle attendu
+     */
+    @Test
+    fun testClosersStation() {
+        val myPosition = LatLng(47.2229697, -1.5334502)
+        val closerStation = MapUtils.getClosersStation(3, myPosition, mStations)
+        assertEquals(25, closerStation[0].id)
+        assertEquals(69, closerStation[1].id)
+        assertEquals(10, closerStation[2].id)
+    }
+
+    /**
      * Recup d'une liste de station pour les test (poition réel récupérer via l'api) => certaines données incohérentes pour des test d'emplacement
      */
     private fun setPositionTest() {

@@ -64,6 +64,25 @@ open class MapUtils {
         }
 
         /**
+         * Recherche les n sttation les plus proche
+         * @param listStationCount Nombre de station à retourner
+         * @param startPosition La position de départ
+         * @param stations La liste des stations de base
+         * @param stationStart Pour cherche les station de départ ou d'arrivé
+         * @return La liste des stations les plus proches
+         */
+        fun getClosersStation(listStationCount: Int, startPosition: LatLng, stations: List<Station>, stationStart: Boolean = true) : List<Station> {
+            val res: MutableList<Station> = ArrayList(listStationCount)
+            val mutableStations: MutableList<Station> = ArrayList(stations)
+            for(i in 0..listStationCount) {
+                val station = getCloserStation(startPosition = startPosition, stations = mutableStations, stationStart = stationStart)
+                res.add(station)
+                mutableStations.remove(station)
+            }
+            return res
+        }
+
+        /**
          * Recherche la station la plus proche
          * @param startPosition La position de reference
          * @param stations La liste des stations
