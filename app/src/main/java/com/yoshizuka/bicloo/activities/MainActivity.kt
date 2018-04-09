@@ -365,7 +365,7 @@ class MainActivity : AppCompatActivity(), StationModel.StationModelListener, OnM
         if(mCurrentFragment is StationFragment) {
             (mCurrentFragment as StationFragment).items = stations
         }
-        loading.visibility = View.GONE
+        loading?.visibility = View.GONE
     }
 
     /**
