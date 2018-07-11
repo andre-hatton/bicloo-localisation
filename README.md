@@ -15,3 +15,25 @@ Améliorations à faire :
 - Ajouter la langue anglaise sur l'application (normalement avec le strings.xml celà devrait se faire assez facilement).
 - Permettre de lancer un itinéraire en mode hors ligne (actuellement une requête est necessaire à voir s'il est possible de faire autrement).
 - Mieux gérer la géolocalistation lorsque le gps n'est pas activé (actuellement c'est forcé sur les coordonnées de Nantes si le gps est éteind)
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/create.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/list.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/menu.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/bottom-open.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/bottom-close.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/bottom-empty.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/list-search.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/list-bottom.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/start-search.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/start-end.png">
+
+<img height="600" alt="portfolio_view" src="https://github.com/andre-hatton/bicloo-localisation/blob/master/screenshots/map.png">
